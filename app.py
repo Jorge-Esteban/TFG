@@ -1,19 +1,22 @@
+#python -m streamlit run app.py
 import pandas as pd
-import pandas.datareader as data
+import pandas_datareader as data
 import numpy as np
 import matplotlib.pyplot as plt
-import yfinance as yf 
-import datetime  
+import yfinance as yf  
 from keras.models import load_model
 import streamlit as st
+import datetime as dt
 
-start = '2012-01-01'
-end = datetime.datetime.now().strftime('%Y-%m-%d')
+start = dt.datetime(2012,1,1)
+end = dt.datetime(2024,1,1)
+#datetime.datetime.now().strftime('%Y-%m-%d')
 
 st.title('Stock Price Prediction App')
 user_input = st.text_input('Enter the stock ticker:', 'AAPL')
 
-df = data.datareader(user_input, 'yahoo', start, end)
+#df = data.DataReader(user_input, 'yahoo', start, end)
+df = data.DataReader( user_input, data_source='yahoo', start=start, end=end)
 
 #Describing data
 st.subheader('Data from 2012 - To today')
