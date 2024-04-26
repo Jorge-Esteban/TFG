@@ -35,7 +35,13 @@ st.table(df.describe())
 
 #Visualizaciones
 st.subheader('Closing price vs Time chart')
-ma100 = df.Close.rolling(100).mean
+ma100 = df.Close.rolling(100).mean()
 fig = plt.figure(figsize=(12,6))
+plt.plot(ma100)
 plt.plot(df.Close)
+plt.plot(ma100, label='100-Day Moving Average')
+plt.plot(df.Close, label='Closing Price')
+plt.legend()
+plt.xlabel("Time", fontsize = 20)
+plt.ylabel("Price", fontsize = 20)
 st.pyplot(fig)
