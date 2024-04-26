@@ -33,6 +33,16 @@ df = pdr.get_data_yahoo(user_input,start,end)
 st.subheader(user_input + " Stock data from " + str(start))
 st.table(df.describe())
 
+#Volatility
+volatility = df['Close'].pct_change().std() * np.sqrt(252)  # Annualized volatility assuming 252 trading days per year
+color = 'off'
+if volatility > 0.75:  # Example threshold for high volatility
+    color = 'inverse'
+elif volatility < 0.25:  # Example threshold for low volatility
+    color = 'normal'
+    
+st.metric("Volatility", " ", delta=volatility, delta_color=color)
+
 #Visualizaciones
 st.subheader('Closing price vs Time chart')
 ma100 = df.Close.rolling(100).mean()
