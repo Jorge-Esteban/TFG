@@ -41,6 +41,14 @@ if volatility > 0.75:  # Example threshold for high volatility
 elif volatility < 0.25:  # Example threshold for low volatility
     color = 'normal'
     
+last_close_price = df['Close'][-1]
+shares_outstanding = 10_000_000  # Example number of shares outstanding
+market_cap = last_close_price * shares_outstanding
+
+# Display market capitalization in a Streamlit card
+st.subheader('Market Capitalization')
+st.metric("Market Cap", market_cap)
+    
 st.metric("Volatility", " ", delta=volatility, delta_color=color)
 
 #Visualizaciones
