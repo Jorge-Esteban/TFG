@@ -34,7 +34,7 @@ st.subheader(user_input + " Stock data from " + str(start))
 st.table(df.describe())
 
 #Volatility
-volatility = df['Close'].pct_change().std() * np.sqrt(252) # Annualized volatility assuming 252 trading days per year
+volatility = round(df['Close'].pct_change().std() * np.sqrt(252), 2) # Annualized volatility assuming 252 trading days per year
 color = 'off'
 if volatility > 0.75:  # Example threshold for high volatility
     color = 'inverse'
@@ -60,10 +60,13 @@ with col2:
 with col3:
     # Return avergae Daily Percentage Change
     st.subheader('Average Daily Percentage Change')
-    st.metric(" ", df['Close'].pct_change().mean())
+    st.metric(" ", round(df['Close'].pct_change().mean(),5))
     
 #Visualizaciones
-st.subheader('Closing price vs Time chart')
+
+
+#Closing price vs 100MA
+st.subheader('Closing price vs Time chart with 100MA')
 fig = plt.figure(figsize=(10,6))
 ma100 = df.Close.rolling(100).mean()
 plt.plot(ma100)
@@ -73,4 +76,12 @@ plt.plot(df.Close, label='Closing Price')
 plt.legend()
 plt.xlabel("Time", fontsize = 20)
 plt.ylabel("Price", fontsize = 20)
+st.pyplot(fig)
+
+st.subheader('Closing Price vs Time chart with 100MA & 200MA')
+ma200 = df.Close.rolling(200).mean()
+fig = plt.figure(figsize=(10,6))
+plt.plot(ma100)
+plt.plot(ma200)
+plt.plot(df.Close, 'b')
 st.pyplot(fig)
