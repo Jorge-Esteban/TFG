@@ -17,7 +17,8 @@ st.title('Stock Price Prediction App')
 
 #Preparacion Datos
 yf.pdr_override()
-user_input = st.text_input('Enter the stock ticker:', 'AAPL')
+Ticker = st.text_input('Enter the stock ticker:', 'AAPL')
+stock_data = yf.Ticker(Ticker)
 start_column, end_column = st.columns(2)
 
 with start_column:
@@ -27,11 +28,12 @@ with end_column:
     end = st.date_input("End date", min_value=start, max_value=max_end, value=max_end)
     
 #Fetching the data
-df = pdr.get_data_yahoo(user_input,start,end)
+df = pdr.get_data_yahoo(Ticker,start,end)
 
 #Describing data
-st.subheader(user_input + " Stock data from " + str(start))
+st.subheader(stock_data.info['longName']+"("+Ticker + ") Stock data from " + str(start))
 st.table(df.describe())
+
 
 #Volatility
 volatility = round(df['Close'].pct_change().std() * np.sqrt(252), 2) # Annualized volatility assuming 252 trading days per year
