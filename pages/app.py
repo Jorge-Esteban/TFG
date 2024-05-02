@@ -3,6 +3,7 @@ import pandas as pd
 from pandas_datareader import data as pdr
 import numpy as np
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import yfinance as yf  
 from keras.models import load_model
 import streamlit as st
@@ -16,16 +17,17 @@ min_start = dt.datetime(2012,1,1).date()
 st.title('Stock Price Prediction App')
 
 #Preparacion Datos
+
 yf.pdr_override()
-Ticker = st.text_input('Enter the stock ticker:', 'AAPL')
+Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
 stock_data = yf.Ticker(Ticker)
 start_column, end_column = st.columns(2)
 
 with start_column:
-    start = st.date_input("Start date", min_value=min_start, max_value=max_end, value=min_start)
+    start = st.sidebar.date_input("Start date", min_value=min_start, max_value=max_end, value=min_start)
 
 with end_column:
-    end = st.date_input("End date", min_value=start, max_value=max_end, value=max_end)
+    end = st.sidebar.date_input("End date", min_value=start, max_value=max_end, value=max_end)
     
 #Fetching the data
 df = pdr.get_data_yahoo(Ticker,start,end)
@@ -53,16 +55,16 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     st.subheader('Volatility')
-    st.metric(" ", volatility)
+    st.write(volatility)
 
 with col2:
     st.subheader('Market Capitalization')
-    st.metric(" ", market_cap)
+    st.write(market_cap)
 
 with col3:
     # Return avergae Daily Percentage Change
-    st.subheader('Average Daily Percentage Change')
-    st.metric(" ", round(df['Close'].pct_change().mean(),5))
+    st.subheader('Avg. Daily Percentage Change')
+    st.write(round(df['Close'].pct_change().mean(),5))
     
 #Visualizaciones
 
@@ -80,6 +82,23 @@ plt.xlabel("Time", fontsize = 20)
 plt.ylabel("Price", fontsize = 20)
 st.pyplot(fig)
 
+#Candle
+fig =plt.Figure(
+    data=[
+        go.Candlestick(
+            x=stock_data['Date'],
+            open=stock_data["Open"],
+            high=stock_data["High"],
+            low=stock_data["Low"],
+            close=stock_data["Close"],
+        )
+    ]
+)
+
+# Use the native streamlit theme.
+st.plotly_chart(fig, use_container_width=True)
+
+#Closing price vs 100MA & 200MA
 st.subheader('Closing Price vs Time chart with 100MA & 200MA')
 ma200 = df.Close.rolling(200).mean()
 fig = plt.figure(figsize=(10,6))
@@ -116,14 +135,14 @@ model = load_model('stock_prediction.h5')
 
 #Testing part
 past_100_days = data_training.tail(100)
-final_df = past_100_days.append(data_testing, ignore_index = True)
+final_df = past_100_days._append(data_testing, ignore_index = True)
 input_data = scaler.fit_transform(final_df)
 
 x_test = []
 y_test = []
 
 for i in range(100,input_data.shape[0]):
-    x_test.append(input_data[i-100:,i])
+    x_test.append(input_data[i-100:i])
     y_test.append(input_data[i,0])
     
 x_test, y_test = np.array(x_test), np.array(y_test)
