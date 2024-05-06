@@ -21,6 +21,7 @@ st.title('Stock Price Prediction App')
 yf.pdr_override()
 Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
 stock_data = yf.Ticker(Ticker)
+
 start_column, end_column = st.columns(2)
 
 with start_column:
@@ -35,7 +36,6 @@ df = pdr.get_data_yahoo(Ticker,start,end)
 #Describing data
 st.subheader(stock_data.info['longName']+"("+Ticker + ") Stock data from " + str(start))
 st.table(df.describe())
-
 
 #Volatility
 volatility = round(df['Close'].pct_change().std() * np.sqrt(252), 2) # Annualized volatility assuming 252 trading days per year
@@ -66,10 +66,10 @@ with col3:
     st.subheader('Avg. Daily Percentage Change')
     st.write(round(df['Close'].pct_change().mean(),5))
     
+    
 #Visualizaciones
 
-
-#Closing price vs 100MA
+    #Closing price vs 100MA
 st.subheader('Closing price vs Time chart with 100MA')
 fig = plt.figure(figsize=(10,6))
 ma100 = df.Close.rolling(100).mean()
@@ -82,23 +82,19 @@ plt.xlabel("Time", fontsize = 20)
 plt.ylabel("Price", fontsize = 20)
 st.pyplot(fig)
 
-#Candle
-fig =plt.Figure(
-    data=[
-        go.Candlestick(
-            x=stock_data['Date'],
-            open=stock_data["Open"],
-            high=stock_data["High"],
-            low=stock_data["Low"],
-            close=stock_data["Close"],
-        )
-    ]
-)
+    #Candle
+fig = go.Figure(go.Candlestick(
+        x=df.index,
+        open=df['Open'],
+        high=df['High'],
+        low=df['Low'],
+        close=df['Close']
+    ))
 
-# Use the native streamlit theme.
+    #Use the native streamlit theme.
 st.plotly_chart(fig, use_container_width=True)
 
-#Closing price vs 100MA & 200MA
+    #Closing price vs 100MA & 200MA
 st.subheader('Closing Price vs Time chart with 100MA & 200MA')
 ma200 = df.Close.rolling(200).mean()
 fig = plt.figure(figsize=(10,6))
@@ -152,7 +148,7 @@ scaler = scaler.scale_
 scale_factor = 1/scaler[0]
 y_predicted = y_predicted*scale_factor
 y_test = y_test*scale_factor
-
+st.write()
 #Final Graph
 st.subheader('Predictions vs Original')
 fig2 = plt.figure(figsize=(10,6))
@@ -163,3 +159,35 @@ plt.ylabel('Price')
 plt.legend()
 plt.show()
 st.pyplot(fig2)
+
+increasing_color1 = '#00FF00'  # Green
+decreasing_color1 = '#FF0000'  # Red
+increasing_color2 = '#2A57A3'  # Blue
+decreasing_color2 = '#E0A100'  # Gold
+trace_original = go.Candlestick(x=df.index,
+                                 open=y_test,
+                                 high=y_test,
+                                 low=y_test,
+                                 close=y_test,
+                                 increasing_line_color=increasing_color1,
+                                 decreasing_line_color=decreasing_color1,
+                                 name='Original Price')
+trace_predicted = go.Candlestick(x=df.index,
+                                 open=y_predicted,
+                                 high=y_predicted,
+                                 low=y_predicted,
+                                 close=y_predicted,
+                                 increasing_line_color=increasing_color2,
+                                 decreasing_line_color=decreasing_color2,
+                                 name='Predicted Price')
+
+# Create layout
+layout = go.Layout(title='Predictions vs Original',
+                   xaxis=dict(title='Time'),
+                   yaxis=dict(title='Price'))
+
+# Create figure
+fig_candlestick = go.Figure(data=[trace_original, trace_predicted], layout=layout)
+
+# Show the candlestick chart
+st.plotly_chart(fig_candlestick)
