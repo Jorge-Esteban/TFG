@@ -2,11 +2,10 @@ import streamlit as st
 import pages
 
 def main():
-    st.title("Streamlit Homepage")
 
     # Sidebar
     st.sidebar.title("Navigation")
-    st.write("# Welcome to Streamlit! 👋")
+    st.write("# Welcome Stock prediction! 👋")
     st.sidebar.success("Select a demo above.")
 
 if __name__ == "__main__":
