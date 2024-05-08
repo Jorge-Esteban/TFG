@@ -33,11 +33,8 @@ googlenews.enableException(True)
 googlenews.search(stock_data1.info['longName'])
 result = googlenews.results(sort=True)
 
-//**
 for i in range(10):
     st.header(result[i]['title'])
     st.subheader(result[i]['media'])
-    st.write(result[i]['author'])
     st.write(result[i]['desc'])
-    st.image(result[i]['urlToImage'])
-    **/
+    st.image(result[i]['image'])

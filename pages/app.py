@@ -159,7 +159,9 @@ plt.xlabel('Time')
 plt.ylabel('Price')
 plt.legend()
 plt.show()
-st.pyplot(fig2)
+Graph_img = plt.savefig('Predictions vs Original.png')
+
+st.download_button("Download Graph", Graph_img)
 
 increasing_color1 = '#00FF00'  # Green
 decreasing_color1 = '#FF0000'  # Red
