@@ -31,8 +31,13 @@ with end_column:
 googlenews = GoogleNews(lang='en', period=7 ,encode='utf-8')
 googlenews.enableException(True)
 googlenews.search(stock_data1.info['longName'])
-result = googlenews.results()
+result = googlenews.results(sort=True)
 
-st.write(result[i]['title'])
-for i in 2:
-    st.write(result[i]['title'])
+//**
+for i in range(10):
+    st.header(result[i]['title'])
+    st.subheader(result[i]['media'])
+    st.write(result[i]['author'])
+    st.write(result[i]['desc'])
+    st.image(result[i]['urlToImage'])
+    **/
