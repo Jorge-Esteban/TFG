@@ -5,7 +5,8 @@ def main():
 
     # Sidebar
     st.sidebar.title("Navigation")
-    st.write("# Welcome Stock prediction! 👋")
+    st.title("Welcome Stock prediction! 👋")
+    st.subheader("Web-App created by Jorge Esteban Gil")
     st.sidebar.success("Select a demo above.")
 
 if __name__ == "__main__":

@@ -8,8 +8,8 @@ import yfinance as yf
 from keras.models import load_model
 import streamlit as st
 import datetime as dt
-from newspaper import Article
-
+import io
+import base64
 #Variables
 max_end = dt.datetime.now().date()
 min_start = dt.datetime(2012,1,1).date()
@@ -36,7 +36,7 @@ df = pdr.get_data_yahoo(Ticker,start,end)
 
 #Describing data
 st.subheader(stock_data.info['longName']+"("+Ticker + ") Stock data from " + str(start))
-st.table(df.describe())
+st.table(stock_data.balancesheet)
 
 #Volatility
 volatility = round(df['Close'].pct_change().std() * np.sqrt(252), 2) # Annualized volatility assuming 252 trading days per year
@@ -81,6 +81,7 @@ plt.plot(df.Close,'b', label='Closing Price')
 plt.legend()
 plt.xlabel("Time", fontsize = 20)
 plt.ylabel("Price", fontsize = 20)
+plt.style.use('dark_background')
 st.pyplot(fig)
 
     #Candle
@@ -102,6 +103,7 @@ fig = plt.figure(figsize=(10,6))
 plt.plot(ma100, 'r', label = '100-Day Moving Average')
 plt.plot(ma200, 'g', label = '200-Day Moving Average')
 plt.plot(df.Close, 'b', label = 'Closing Price')
+plt.style.use('dark_background')
 st.pyplot(fig)
 
 
@@ -150,6 +152,7 @@ scale_factor = 1/scaler[0]
 y_predicted = y_predicted*scale_factor
 y_test = y_test*scale_factor
 st.write()
+
 #Final Graph
 st.subheader('Predictions vs Original')
 fig2 = plt.figure(figsize=(10,6))
@@ -158,10 +161,13 @@ plt.plot(y_predicted, 'r', label= 'Predicted Price')
 plt.xlabel('Time')
 plt.ylabel('Price')
 plt.legend()
-plt.show()
-Graph_img = plt.savefig('Predictions vs Original.png')
+plt.style.use('dark_background')
+st.pyplot(fig=fig2)
+bytes = io.BytesIO()
+plt.savefig(bytes, format="png")
+Graph_img = base64.b64encode(bytes.read())
 
-st.download_button("Download Graph", Graph_img)
+st.download_button("Download Graph", Graph_img, "PredictionVsOriginal")
 
 increasing_color1 = '#00FF00'  # Green
 decreasing_color1 = '#FF0000'  # Red
