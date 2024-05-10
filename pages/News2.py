@@ -25,22 +25,17 @@ yf.pdr_override()
 Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
 stock_data = yf.Ticker(Ticker)
 
-start_column, end_column = st.columns(2)
-
-with start_column:
-    start = st.sidebar.date_input("Start date", min_value=min_start, max_value=max_end, value=min_start)
-
-with end_column:
-    end = st.sidebar.date_input("End date", min_value=start, max_value=max_end, value=max_end)
-    
 #Fetching the data
-df = pdr.get_data_yahoo(Ticker,start,end)
+df = pdr.get_data_yahoo(Ticker)
 
 #Describing data
-st.subheader(stock_data.info['longName']+"("+Ticker + ") Stock data from " + str(start))
+st.subheader(stock_data.info['longName']+"("+Ticker)
 
-for i in range(7):
-    st.header(stock_data.news[i]['title'], anchor=stock_data.news[i]['link'])
+st.write(stock_data.news)
+for i in range(len(stock_data.news)):
+    st.title(stock_data.news[i]['title'], anchor=stock_data.news[i]['link'])
     st.subheader(stock_data.news[i]['publisher'])
+    for j in range(len(stock_data.news[i]['relatedTickers'])):
+        st.caption(stock_data.news[i]['relatedTickers'][j])
 
         
