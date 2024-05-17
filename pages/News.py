@@ -1,40 +1,42 @@
-#python -m streamlit run app.py
+import streamlit as st
 import pandas as pd
 from pandas_datareader import data as pdr
-import numpy as np
-import yfinance as yf  
-import streamlit as st
-import datetime as dt
-from GoogleNews import GoogleNews
+import requests
+from PIL import Image
+import io
+import yfinance as yf 
 
-#Título
-st.title('Stock Market News')
+# Función para mostrar imágenes desde enlaces
+def show_image_from_link(link, caption=None):
+    r = requests.get(link)
+    img = Image.open(io.BytesIO(r.content))
+    st.image(img, caption=caption, use_column_width=True)
 
-#Variables
-max_end = dt.datetime.now().date()
-min_start = dt.datetime(2012,1,1).date()
+# Función para mostrar las noticias relacionadas con un ticker
+def mostrar_noticias(ticker):
+    # Aquí podrías llamar a tu función o API para obtener las noticias relacionadas con el ticker
+    pass
 
-#Collecting data...
+# Título
+st.title('Stock Price Prediction App')
+
+# Barra lateral para introducir el ticker
+ticker_input = st.sidebar.text_input("Introduce el ticker", value="AAPL")
+search_button = st.sidebar.button("Buscar")
+
+# Si se hace clic en el botón de búsqueda, mostrar las noticias relacionadas con el ticker
+if search_button:
+    st.write(f"Noticias relacionadas con el ticker: {ticker_input}")
+    mostrar_noticias(ticker_input)
+
+# Preparación de datos
 yf.pdr_override()
-Ticker1 = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
-stock_data1 = yf.Ticker(Ticker1)
+Ticker = ticker_input
+stock_data = yf.Ticker(Ticker)
 
-start_column, end_column = st.columns(2)
+# Mostrar datos
+df = pdr.get_data_yahoo(Ticker)
 
-with start_column:
-    start_date = st.sidebar.date_input("Start date", min_value=min_start, max_value=max_end, value=min_start)
-
-with end_column:
-    end_date = st.sidebar.date_input("End date", min_value=start_date, max_value=max_end, value=max_end)
-
-#GoogleNews data
-googlenews = GoogleNews(lang='en', period=7 ,encode='utf-8')
-googlenews.enableException(True)
-googlenews.search(stock_data1.info['longName'])
-result = googlenews.results(sort=True)
-
-for i in range(10):
-    st.header(result[i]['title'])
-    st.subheader(result[i]['media'])
-    st.write(result[i]['desc'])
-    st.image(result[i]['image'])
+# Descripción de datos
+st.subheader(stock_data.info['longName']+"("+Ticker)
+st.write(stock_data.news)
