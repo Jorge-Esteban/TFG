@@ -9,7 +9,7 @@ def main():
     st.subheader("Web-App created by Jorge Esteban Gil")
     st.sidebar.success("Select a demo above.")
     
-    st.page_link("pages/app.py", label="Go to the Info page", icon="📈")
+    st.page_link("pages/Info.py", label="Go to the Info page", icon="📈")
     st.page_link("pages/Compare.py", label="Go to the Compare page", icon="🔀")
     st.page_link("pages/News2.py", label="Go to the News page", icon="📰")
     

@@ -36,8 +36,8 @@ df = pdr.get_data_yahoo(Ticker,start,end)
 
 #Describing data
 st.subheader(stock_data.info['longName']+"("+Ticker + ") Stock data from " + str(start))
-st.table(stock_data.balancesheet)
-
+st.write(stock_data.financials)
+st.write(stock_data.history(period="1d"))
 #Volatility
 volatility = round(df['Close'].pct_change().std() * np.sqrt(252), 2) # Annualized volatility assuming 252 trading days per year
 color = 'off'
