@@ -16,8 +16,7 @@ def show_image_from_link(link, caption=None):
     img = Image.open(io.BytesIO(r.content))
     st.image(img, caption=caption, use_column_width=True)
 
-# Title
-st.title('Stock Price Prediction App')
+
 
 # Prepare Data
 yf.pdr_override()
@@ -34,25 +33,23 @@ ticker_input = st.sidebar.text_input('Enter the stock ticker:', st.query_params.
 # Fetching the data
 stock_data, df = fetch_data(ticker_input)
 
-# Describe data
-st.subheader(stock_data.info['longName'] + "(" + ticker_input + ")")
+# Title
+st.title(stock_data.info['longName'] + "(" + ticker_input + ") Latest News")
 
 
 # Function to display news
 def mostrar_noticia(noticia):
-    with st.container():
+    with st.container(border=True):
         st.header(noticia['title'], anchor=noticia['link'])
         st.caption(noticia['publisher'] + " for " + noticia['publisher'])
-        st.write(noticia['link'])
-        
         # Check if 'thumbnail' exists and has proper resolutions
         if 'thumbnail' in noticia and noticia['thumbnail'] and 'resolutions' in noticia['thumbnail'] and noticia['thumbnail']['resolutions']:
             show_image_from_link(noticia['thumbnail']['resolutions'][0]['url'])
-        
+        st.write("[Link to the news](%s)" % noticia['link'])
         # Show related tickers
         if noticia['relatedTickers']:
             tickers = ', '.join([f"[{ticker}](/News2?ticker={ticker})" for ticker in noticia['relatedTickers']])
-            st.markdown(f"**Related Tickers:** {tickers}")
+            st.markdown(f"**Related Stocks:** {tickers}")
 
 # Iterate over news and display
 for noticia in stock_data.news:

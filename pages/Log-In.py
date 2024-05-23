@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_login_auth_ui.widgets import __login__
-__login__obj = __login__(auth_token = "dk_prod_HGGX1CDP0Z404VJ1EGW8PZTVK510", 
+__login__obj = __login__(auth_token = "pk_prod_0EDPKCYQBF472VHQ6J6FCNE24K4Q", 
                     company_name = "Stock Prediction App Team",
                     width = 200, height = 250, 
                     logout_button_name = 'Logout', hide_menu_bool = False, 
