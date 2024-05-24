@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import yfinance as yf  
-from keras.models import load_model
+from tensorflow.python.keras.models import load_model
 import streamlit as st
 import datetime as dt
 

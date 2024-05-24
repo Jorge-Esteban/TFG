@@ -1,5 +1,5 @@
 import streamlit as st
-import pages
+import st_pages
 
 def main():
 
@@ -11,8 +11,9 @@ def main():
     
     st.page_link("pages/Info.py", label="Go to the Info page", icon="📈")
     st.page_link("pages/Compare.py", label="Go to the Compare page", icon="🔀")
+    st.page_link("pages/Prediction.py", label="Go to the Prediction pages", icon="🔮")
     st.page_link("pages/News2.py", label="Go to the News page", icon="📰")
-    
+
     
 
 if __name__ == "__main__":

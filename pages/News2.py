@@ -22,37 +22,40 @@ def show_image_from_link(link, caption=None):
 yf.pdr_override()
 
 # Function to fetch data
-def fetch_data(ticker):
-    stock_data = yf.Ticker(ticker)
-    df = pdr.get_data_yahoo(ticker)
-    return stock_data, df
+try:
+    def fetch_data(ticker):
+        stock_data = yf.Ticker(ticker)
+        df = pdr.get_data_yahoo(ticker)
+        return stock_data, df
 
 # Sidebar for entering stock ticker
-ticker_input = st.sidebar.text_input('Enter the stock ticker:', st.query_params.get("ticker", "AAPL"))
+    ticker_input = st.sidebar.text_input('Enter the stock ticker:', st.query_params.get("ticker", "AAPL"))
 
 # Fetching the data
-stock_data, df = fetch_data(ticker_input)
+    stock_data, df = fetch_data(ticker_input)
 
 # Title
-st.title(stock_data.info['longName'] + "(" + ticker_input + ") Latest News")
+
+    st.title(stock_data.info['longName'] + "(" + ticker_input + ") Latest News")
 
 
-# Function to display news
-def mostrar_noticia(noticia):
-    with st.container(border=True):
-        st.header(noticia['title'], anchor=noticia['link'])
-        st.caption(noticia['publisher'] + " for " + noticia['publisher'])
-        # Check if 'thumbnail' exists and has proper resolutions
-        if 'thumbnail' in noticia and noticia['thumbnail'] and 'resolutions' in noticia['thumbnail'] and noticia['thumbnail']['resolutions']:
-            show_image_from_link(noticia['thumbnail']['resolutions'][0]['url'])
-        st.write("[Link to the news](%s)" % noticia['link'])
-        # Show related tickers
-        if noticia['relatedTickers']:
-            tickers = ', '.join([f"[{ticker}](/News2?ticker={ticker})" for ticker in noticia['relatedTickers']])
-            st.markdown(f"**Related Stocks:** {tickers}")
+    # Function to display news
+    def show_news(noticia):
+        with st.container(border=True):
+            st.header(noticia['title'], anchor=noticia['link'], divider=True)
+            st.caption(noticia['publisher'] + " for " + noticia['publisher'])
+            # Check if 'thumbnail' exists and has proper resolutions
+            if 'thumbnail' in noticia and noticia['thumbnail'] and 'resolutions' in noticia['thumbnail'] and noticia['thumbnail']['resolutions']:
+                show_image_from_link(noticia['thumbnail']['resolutions'][0]['url'])
+            st.write("[Link to the news](%s)" % noticia['link'])
+            # Show related tickers
+            st.divider()
+            if noticia['relatedTickers']:
+                tickers = ', '.join([f"[{ticker}](/News2?ticker={ticker})" for ticker in noticia['relatedTickers']])
+                st.markdown(f"**Related Stocks:** {tickers}")
 
-# Iterate over news and display
-for noticia in stock_data.news:
-    mostrar_noticia(noticia)
-
-
+    # Iterate over news and display
+    for noticia in stock_data.news:
+        show_news(noticia)
+except : 
+    st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
