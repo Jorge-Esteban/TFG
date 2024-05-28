@@ -4,6 +4,7 @@ from pandas_datareader import data as pdr
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import plotly.express as px
 import yfinance as yf  
 from tensorflow.python.keras.models import load_model
 import streamlit as st
@@ -59,30 +60,19 @@ fig.update_layout(xaxis_rangeslider_visible=False)
 
 # Use the native streamlit theme.
 st.plotly_chart(fig, use_container_width=True)
-    #Closing price vs 100MA
-st.subheader('Closing price vs Time chart with 100MA')
-fig = plt.figure(figsize=(10,6))
-ma100 = df['Close'].rolling(100).mean()
-plt.plot(ma100)
-plt.plot(df['Close'])
-plt.plot(ma100, 'r',label='100-Day Moving Average')
-plt.plot(df['Close'],'b', label='Closing Price')
-plt.legend()
-plt.xlabel("Time", fontsize = 20)
-plt.ylabel("Price", fontsize = 20)
-st.pyplot(fig)
 
-#Use the native streamlit theme.
+#Closing price vs 100MA
+st.subheader('Closing price vs Time chart with 100MA')
+df['MA100'] = df['Close'].rolling(100).mean()
+fig = px.line(df, x=df.index, y=['Close', 'MA100'], labels={'value': 'Price', 'variable': 'Legend'}, title='Closing Price vs 100-Day Moving Average',color_discrete_map={'MA100': '#F15050', 'Close':'#50BBD8'})
 st.plotly_chart(fig, use_container_width=True)
 
-    #Closing price vs 100MA & 200MA
+
+# Closing price vs 100MA & 200MA
 st.subheader('Closing Price vs Time chart with 100MA & 200MA')
-ma200 = df.Close.rolling(200).mean()
-fig = plt.figure(figsize=(10,6))
-plt.plot(ma100, 'r', label = '100-Day Moving Average')
-plt.plot(ma200, 'g', label = '200-Day Moving Average')
-plt.plot(df.Close, 'b', label = 'Closing Price')
-st.pyplot(fig)
+df['MA200'] = df['Close'].rolling(200).mean()
+fig = px.line(df, x=df.index, y=['Close', 'MA100', 'MA200'], labels={'value': 'Price', 'variable': 'Legend'}, title='Closing Price vs 100-Day Moving Average vs 200-Day moving Average',color_discrete_map={'MA200': '#47F388','MA100': '#F15050', 'Close':'#50BBD8'})
+st.plotly_chart(fig, use_container_width=True)
 
 
 #######################################
