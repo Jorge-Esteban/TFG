@@ -64,14 +64,24 @@ st.plotly_chart(fig, use_container_width=True)
 #Closing price vs 100MA
 st.subheader('Closing price vs Time chart with 100MA')
 df['MA100'] = df['Close'].rolling(100).mean()
-fig = px.line(df, x=df.index, y=['Close', 'MA100'], labels={'value': 'Price', 'variable': 'Legend'}, title='Closing Price vs 100-Day Moving Average',color_discrete_map={'MA100': '#F15050', 'Close':'#50BBD8'})
+fig = px.line(df, 
+              x=df.index, 
+              y=['Close', 'MA100'], 
+              labels={'value': 'Price', 'variable': 'Legend'}, 
+              title='Closing Price vs 100-Day Moving Average',
+              color_discrete_map={'MA100': '#F15050', 'Close':'#50BBD8'})
 st.plotly_chart(fig, use_container_width=True)
 
 
 # Closing price vs 100MA & 200MA
 st.subheader('Closing Price vs Time chart with 100MA & 200MA')
 df['MA200'] = df['Close'].rolling(200).mean()
-fig = px.line(df, x=df.index, y=['Close', 'MA100', 'MA200'], labels={'value': 'Price', 'variable': 'Legend'}, title='Closing Price vs 100-Day Moving Average vs 200-Day moving Average',color_discrete_map={'MA200': '#47F388','MA100': '#F15050', 'Close':'#50BBD8'})
+fig = px.line(df, 
+              x=df.index, 
+              y=['Close', 'MA100', 'MA200'], 
+              labels={'value': 'Price', 'variable': 'Legend'}, 
+              title='Closing Price vs 100-Day Moving Average vs 200-Day moving Average',
+              color_discrete_map={'MA200': '#47F388','MA100': '#F15050', 'Close':'#50BBD8'})
 st.plotly_chart(fig, use_container_width=True)
 
 

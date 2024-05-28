@@ -8,11 +8,21 @@ import yfinance as yf
 from tensorflow.python.keras.models import load_model
 import streamlit as st
 import datetime as dt
+import plotly.express as px
 
 #Variables
 max_end = dt.datetime.now().date()
 min_start = dt.datetime(2012,1,1).date()
 
+#Funciones
+def format_shares_money(x):
+        if x >= 1e9:  # If value is greater than or equal to 1 billion
+            return '{:.2f}B'.format(x / 1e9)
+        elif x >= 1e6:  # If value is greater than or equal to 1 million
+            return '{:.2f}M'.format(x / 1e6)
+        else:
+            return '{:.2f}'.format(x)
+        
 #Título
 st.title('Stock Price Prediction App')
 
@@ -35,40 +45,60 @@ with end_column:
 df1 = pdr.get_data_yahoo(Ticker1,start,end)
 df2 = pdr.get_data_yahoo(Ticker2,start,end)
 
+Compare_df = pd.DataFrame(columns=['Metric', 'Stock1', 'Stock2'])
+Technical_df = pd.DataFrame(columns=['Metric', 'Stock1', 'Stock2'])
+Key_statistics_df = pd.DataFrame(columns=['Metric', 'Stock1', 'Stock2'])
+
+metrics_compare = {
+    'Open': lambda x: x.info['open'],
+    'Low ': lambda x: x.info['dayLow'],
+    'High': lambda x: x.info['dayHigh'],
+    'Last Close': lambda x: x.info['previousClose'],
+    'Volume': lambda x: x.info['volume'],
+    '10-Day Average Volume': lambda x: x.info['averageDailyVolume10Day'],
+    'Industry':  lambda x: x.info['industry'],
+    'Sector':  lambda x: x.info['sector']   
+}
+metrics_technical= {
+    #'20-Day Moving Average' : lambda x: x['Close'].rolling(20).mean(),
+}
+metrics_statistics= {
+    'Market Cap': lambda x: x.info['marketCap'],
+    'Shares Outstanding' : lambda x: x.info['sharesOutstanding'],
+    'Last Anual net Income': lambda x: x.financials.iloc[23,0],
+    'Last Quarter Performance': lambda x: x.info['mostRecentQuarter']
+}
+
+for metric_name, metric_func in metrics_compare.items():
+    Compare_df.loc[len(Compare_df)] = [metric_name, metric_func(stock_data1), metric_func(stock_data2)]
+
+for metric_name, metric_func in metrics_technical.items():
+    Technical_df.loc[len(Technical_df)] = [metric_name, metric_func(df1), metric_func(df1)]
+
+for metric_name, metric_func in metrics_statistics.items():
+    Key_statistics_df.loc[len(Key_statistics_df)] = [metric_name, metric_func(stock_data1), metric_func(stock_data2)] 
+    
+Compare_df.set_index('Metric', inplace=True)
+Technical_df.set_index('Metric', inplace=True)
+Key_statistics_df.set_index('Metric', inplace=True)
+
+Compare_df.loc['Volume'].apply(format_shares_money)
+Compare_df.loc['10-Day Average Volume'].apply(format_shares_money)
+
+Key_statistics_df.loc['Market Cap'].apply(format_shares_money)
+Key_statistics_df.loc['Shares Outstanding'].apply(format_shares_money)
+Key_statistics_df.loc['Last Anual net Income'].apply(format_shares_money)
+
+
 #Describing data
 st.subheader(stock_data1.info['longName']+"("+Ticker1 + ") Stock data from " + str(start))
 st.table(df1.describe())
 
-
-#Volatility
-volatility = round(df1['Close'].pct_change().std() * np.sqrt(252), 2) # Annualized volatility assuming 252 trading days per year
-def VolatilityColor(number):
-    if number > 0.75:  # Example threshold for high volatility
-        return 'red'
-    elif number < 0.25:  # Example threshold for low volatility
-        return 'normal'
-color = VolatilityColor(volatility)
-
-#Market Capitalization
-last_close_price = df1['Close'][-1]
-shares_outstanding = 10_000_000  # Example number of shares outstanding
-market_cap = format(last_close_price * shares_outstanding, '.2f')
-    
-#Useful measures
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.subheader('Volatility')
-    st.write(volatility)
-
-with col2:
-    st.subheader('Market Capitalization')
-    st.write(market_cap)
-
-with col3:
-    # Return avergae Daily Percentage Change
-    st.subheader('Avg. Daily Percentage Change')
-    st.write(round(df1['Close'].pct_change().mean(),5))
+st.subheader('Basic Comparison')
+st.table(Compare_df)
+st.divider()
+st.subheader('Key Statistics')
+st.table(Key_statistics_df)
 ##
 ###
 ####
@@ -76,42 +106,18 @@ with col3:
 st.subheader(stock_data2.info['longName']+"("+Ticker2 + ") Stock data from " + str(start))
 st.table(df2.describe())   
 
-    #Volatility
-volatility2 = round(df2['Close'].pct_change().std() * np.sqrt(252), 2) # Annualized volatility assuming 252 trading days per year
-color = VolatilityColor(volatility2)
-
-#Market Capitalization
-last_close_price = df2['Close'][-1]
-shares_outstanding = 10_000_000  # Example number of shares outstanding
-market_cap = format(last_close_price * shares_outstanding, '.2f')
-    
-#Useful measures
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.subheader('Volatility')
-    st.write(volatility2)
-
-with col2:
-    st.subheader('Market Capitalization')
-    st.write(market_cap)
-
-with col3:
-    # Return avergae Daily Percentage Change
-    st.subheader('Avg. Daily Percentage Change')
-    st.write(round(df2['Close'].pct_change().mean(),5))
     
 #Visualizaciones
 
-    #Stock comparison
-st.subheader(stock_data1.info['longName'] + " vs " + stock_data2.info['longName'])
-fig = plt.figure(figsize=(10,6))
-plt.plot(df1.Close)
-plt.plot(df2.Close, 'g',label=Ticker2+'Closing price')
-plt.plot(df1.Close,'b', label=Ticker1+'Closing price')
-plt.legend()
-plt.xlabel("Time", fontsize = 20)
-plt.ylabel("Price", fontsize = 20)
-st.pyplot(fig)
-
-
+#Closing price vs 100MA
+st.subheader(stock_data1.info['longName'] + 'vs ' + stock_data2.info['longName'])
+df = pd.DataFrame()
+df['Stock1'] = df1['Close'].rolling(100).mean()
+df['Stock2'] = df2['Close'].rolling(100).mean()
+fig = px.line(df, 
+              x=df.index, 
+              y=['Stock1', 'Stock2'], 
+              labels={'value': 'Price', 'variable': 'Legend'}, 
+              title=stock_data1.info['longName']+stock_data2.info['longName'],
+              color_discrete_map={'Stock1': '#F15050', 'Stock2':'#50BBD8'})
+st.plotly_chart(fig, use_container_width=True)

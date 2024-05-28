@@ -71,8 +71,8 @@ if 'website' in stock_data.info:
     st.write("[Link to website](%s)" % stock_data.info['website'])
 if 'irWebsite' in stock_data.info:
     st.write("[Link to investor relations website](%s)" % stock_data.info['irWebsite'])
+    
 #Description  
-
 if 'longBusinessSummary' in stock_data.info:            
     with st.container(border=True):
         st.write(stock_data.info['longBusinessSummary'])  
@@ -80,7 +80,7 @@ if 'longBusinessSummary' in stock_data.info:
 #Holders
 clean_institutional_holders(df_instHolders)
 st.write('Major institutonial investors:')
-st.dataframe(df_instHolders)
+st.table(df_instHolders)
 
 #Main officers
 if 'companyOfficers' in stock_data.info:           
@@ -94,13 +94,3 @@ if 'companyOfficers' in stock_data.info:
             if i + j < num_officers:
                 with cols[j]:
                     show_officer(officers[i + j])
-        
-#Fetching the data
-df = pdr.get_data_yahoo(Ticker,start,end)
-
-
-
-#Market Capitalization
-last_close_price = df['Close'][-1]
-shares_outstanding = 10_000_000  # Example number of shares outstanding
-market_cap = format(last_close_price * shares_outstanding, '.2f')
