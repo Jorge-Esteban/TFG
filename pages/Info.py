@@ -50,8 +50,7 @@ def show_officer(officer):
                 st.write("Age:, ",officer['age'])
             if'totalPay' in officer:
                 st.write("Anual pay: ", officer['totalPay'])
-
-end
+    
 # new_column_names = [str(col)[:4] for col in df_balancesheet.columns]
 # new_column_names
 # df_balancesheet.rename(columns=new_column_names, inplace=True)
@@ -79,10 +78,11 @@ if 'longBusinessSummary' in stock_data.info:
 
 #Holders
 clean_institutional_holders(df_instHolders)
-st.write('Major institutonial investors:')
-st.table(df_instHolders)
+st.subheader('Major institutonial investors:')
+st.table(df_instHolders.style.background_gradient(cmap='Blues'))
 
 #Main officers
+st.subheader('Main officers:')
 if 'companyOfficers' in stock_data.info:           
     officers = stock_data.info['companyOfficers']
     num_columns = 2

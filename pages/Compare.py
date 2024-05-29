@@ -22,7 +22,9 @@ def format_shares_money(x):
             return '{:.2f}M'.format(x / 1e6)
         else:
             return '{:.2f}'.format(x)
-        
+
+def style_dataframe(df: pd.DataFrame)-> pd.io.formats.style.Styler:
+    df = df.style.background_gradient(cmap='Blues') 
 #Título
 st.title('Stock Price Prediction App')
 
@@ -47,7 +49,10 @@ df2 = pdr.get_data_yahoo(Ticker2,start,end)
 
 Compare_df = pd.DataFrame(columns=['Metric', 'Stock1', 'Stock2'])
 Technical_df = pd.DataFrame(columns=['Metric', 'Stock1', 'Stock2'])
+Recommendation_df = pd.DataFrame(columns=['Metric', 'Stock1', 'Stock2'])
 Key_statistics_df = pd.DataFrame(columns=['Metric', 'Stock1', 'Stock2'])
+df = pd.DataFrame()
+
 
 metrics_compare = {
     'Open': lambda x: x.info['open'],
@@ -60,7 +65,16 @@ metrics_compare = {
     'Sector':  lambda x: x.info['sector']   
 }
 metrics_technical= {
-    #'20-Day Moving Average' : lambda x: x['Close'].rolling(20).mean(),
+    '20-Day Moving Average' : lambda x: x['Close'].rolling(20).mean().iloc[-1],
+    '50-Day Moving Average' : lambda x: x['Close'].rolling(50).mean().iloc[-1],
+    '100-Day Moving Average' : lambda x: x['Close'].rolling(100).mean().iloc[-1]  
+}
+metric_recommendation= {
+    'Strong buy': lambda x: x.recommendations['strongBuy'].iloc[2],
+    'Buy': lambda x: x.recommendations['buy'].iloc[2], 
+    'Hold': lambda x: x.recommendations['hold'].iloc[2],
+    'Sell': lambda x: x.recommendations['sell'].iloc[2],
+    'Strong sell': lambda x: x.recommendations['strongSell'].iloc[3],
 }
 metrics_statistics= {
     'Market Cap': lambda x: x.info['marketCap'],
@@ -73,51 +87,61 @@ for metric_name, metric_func in metrics_compare.items():
     Compare_df.loc[len(Compare_df)] = [metric_name, metric_func(stock_data1), metric_func(stock_data2)]
 
 for metric_name, metric_func in metrics_technical.items():
-    Technical_df.loc[len(Technical_df)] = [metric_name, metric_func(df1), metric_func(df1)]
+    Technical_df.loc[len(Technical_df)] = [metric_name, metric_func(df1), metric_func(df2)]
 
+for metric_name, metric_func in metric_recommendation.items():
+    Recommendation_df.loc[len(Key_statistics_df)] = [metric_name, metric_func(stock_data1), metric_func(stock_data2)]
+                                                                                                      
 for metric_name, metric_func in metrics_statistics.items():
     Key_statistics_df.loc[len(Key_statistics_df)] = [metric_name, metric_func(stock_data1), metric_func(stock_data2)] 
     
 Compare_df.set_index('Metric', inplace=True)
 Technical_df.set_index('Metric', inplace=True)
 Key_statistics_df.set_index('Metric', inplace=True)
-
+Recommendation_df.set_index('Metric', inplace=True)
+stock_data2.recommendations
 Compare_df.loc['Volume'].apply(format_shares_money)
 Compare_df.loc['10-Day Average Volume'].apply(format_shares_money)
+Compare_df.rename(columns={'Stock1': stock_data1.info['longName'], 'Stock2': stock_data2.info['longName']}, inplace=True)
+
+
+Technical_df.rename(columns={'Stock1': stock_data1.info['longName'], 'Stock2': stock_data2.info['longName']}, inplace=True)
+
+
+Recommendation_df.rename(columns={'Stock1': stock_data1.info['longName'], 'Stock2': stock_data2.info['longName']}, inplace=True)
+
 
 Key_statistics_df.loc['Market Cap'].apply(format_shares_money)
 Key_statistics_df.loc['Shares Outstanding'].apply(format_shares_money)
 Key_statistics_df.loc['Last Anual net Income'].apply(format_shares_money)
+Key_statistics_df.rename(columns={'Stock1': stock_data1.info['longName'], 'Stock2': stock_data2.info['longName']}, inplace=True)
 
 
-#Describing data
-st.subheader(stock_data1.info['longName']+"("+Ticker1 + ") Stock data from " + str(start))
-st.table(df1.describe())
+with st.container(border=True):
+    st.subheader('Basic Comparison')
+    st.table(Compare_df)
+    st.divider()
+    st.subheader('Technical Comparison')
+    st.table(Technical_df)
+    st.divider()
+    st.subheader('Key Statistics')
+    st.table(Key_statistics_df)
+    st.divider()
+    st.subheader('Expert reccomendations')
+    st.table(Recommendation_df)
 
-st.subheader('Basic Comparison')
-st.table(Compare_df)
-st.divider()
-st.subheader('Key Statistics')
-st.table(Key_statistics_df)
-##
-###
-####
-#Second stock
-st.subheader(stock_data2.info['longName']+"("+Ticker2 + ") Stock data from " + str(start))
-st.table(df2.describe())   
-
-    
-#Visualizaciones
-
+ 
 #Closing price vs 100MA
 st.subheader(stock_data1.info['longName'] + 'vs ' + stock_data2.info['longName'])
-df = pd.DataFrame()
-df['Stock1'] = df1['Close'].rolling(100).mean()
-df['Stock2'] = df2['Close'].rolling(100).mean()
-fig = px.line(df, 
-              x=df.index, 
+show_df = pd.DataFrame({
+    'Stock1': df1['Close'].rolling(100).mean(),
+    'Stock2': df2['Close'].rolling(100).mean()
+})
+fig = px.line(show_df, 
+              x=show_df.index, 
               y=['Stock1', 'Stock2'], 
               labels={'value': 'Price', 'variable': 'Legend'}, 
-              title=stock_data1.info['longName']+stock_data2.info['longName'],
-              color_discrete_map={'Stock1': '#F15050', 'Stock2':'#50BBD8'})
+              title=stock_data1.info['longName'] + ' vs ' + stock_data2.info['longName'],
+              color_discrete_map={'Stock1': '#F15050', 'Stock2': '#50BBD8'})
+
 st.plotly_chart(fig, use_container_width=True)
