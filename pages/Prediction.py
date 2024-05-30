@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px
 import yfinance as yf  
-from tensorflow.python.keras.models import load_model
+from tensorflow.keras.models import load_model
+from sklearn.preprocessing import MinMaxScaler
 import streamlit as st
 import datetime as dt
 import io
@@ -88,7 +89,16 @@ st.plotly_chart(fig, use_container_width=True)
 #######################################
 ####        THE PREDICTION         ####
 #######################################
-# #Splitting Data into Training and Testing
+
+#Splitting Data into Training and Testing
+data_training = pd.DataFrame(df['Close'][0:int(len(df)*0.70)])
+data_testing = pd.DataFrame(df['Close'][int(len(df)*0.70):int(len(df))])
+
+scaler = MinMaxScaler(feature_range=(0,1))
+
+data_training_array = scaler.fit_transform(data_training)
+
+    #Splitting Data into Training and Testing
 data_training = pd.DataFrame(df['Close'][0:int(len(df)*0.70)])
 data_testing = pd.DataFrame(df['Close'][int(len(df)*0.70):int(len(df))])
 
@@ -105,15 +115,17 @@ y_train = []
 for i in range(100,data_training_array.shape[0]):
     x_train.append(data_training_array[i-100:i])
     y_train.append(data_training_array[i,0])
-    
+
 x_train, y_train = np.array(x_train), np.array(y_train)
+
 
 #Load model
 model = load_model('stock_prediction.h5')
 
+
 #Testing part
 past_100_days = data_training.tail(100)
-final_df = past_100_days.append(data_testing, ignore_index = True)
+final_df = past_100_days._append(data_testing, ignore_index = True)
 input_data = scaler.fit_transform(final_df)
 
 x_test = []
@@ -122,7 +134,7 @@ y_test = []
 for i in range(100,input_data.shape[0]):
     x_test.append(input_data[i-100:i])
     y_test.append(input_data[i,0])
-    
+
 x_test, y_test = np.array(x_test), np.array(y_test)
 y_predicted = model.predict(x_test)
 scaler = scaler.scale_
@@ -131,6 +143,28 @@ scale_factor = 1/scaler[0]
 y_predicted = y_predicted*scale_factor
 y_test = y_test*scale_factor
 st.write()
+
+# Forecasting the next 25 days
+last_100_days = input_data[-100:]  # Last 100 days from the input data
+
+forecast = []
+for _ in range(25):
+    next_pred = model.predict(last_100_days.reshape(1, 100, 1))
+    forecast.append(next_pred[0, 0])
+    next_pred_scaled = next_pred / scale_factor
+    last_100_days = np.append(last_100_days, next_pred_scaled)[1:]
+
+# Scale forecast back to original values
+forecast = np.array(forecast) * scale_factor
+
+# Append forecast to y_predicted DataFrame
+dates = pd.date_range(start=df.index[-1], periods=25)
+forecast_df = pd.DataFrame(forecast, index=dates, columns=['Forecast'])
+
+# Combine actual predictions with forecast
+y_pred_df = pd.DataFrame(y_predicted, index=data_testing.index, columns=['Predicted'])
+combined_df = y_pred_df.append(forecast_df)
+st.dataframe(y_predicted)
 
 #Final Graph
 st.subheader('Predictions vs Original')
@@ -148,36 +182,45 @@ Graph_img = base64.b64encode(bytes.read())
 
 st.download_button("Download Graph", Graph_img, "PredictionVsOriginal")
 
-increasing_color1 = '#00FF00'  # Green
-decreasing_color1 = '#FF0000'  # Red
-increasing_color2 = '#2A57A3'  # Blue
-decreasing_color2 = '#E0A100'  # Gold
-trace_original = go.Candlestick(x=df.index,
-                                open=y_test,
-                                high=y_test,
-                                low=y_test,
-                                close=y_test,
-                                increasing_line_color=increasing_color1,
-                                decreasing_line_color=decreasing_color1,
-                                name='Original Price')
-trace_predicted = go.Candlestick(x=df.index,
-                                open=y_predicted,
-                                high=y_predicted,
-                                low=y_predicted,
-                                close=y_predicted,
-                                increasing_line_color=increasing_color2,
-                                decreasing_line_color=decreasing_color2,
-                                name='Predicted Price')
+st.markdown("## **Stock Prediction**")
 
-# Create layout
-layout = go.Layout(title='Predictions vs Original',
-                xaxis=dict(title='Time'),
-                yaxis=dict(title='Price'))
+# Create a plot for the stock prediction
+fig_pred = go.Figure(
+    data=[
+        go.Scatter(
+            x=df.index,
+            y=df["Close"],
+            name="Train",
+            mode="lines",
+            line=dict(color="blue"),
+        ),
+        go.Scatter(
+            x=df.index,
+            y=y_predicted["Close"],
+            name="Test",
+            mode="lines",
+            line=dict(color="orange"),
+        ),
+        go.Scatter(
+            x=df.index,
+            y=x_train,
+            name="Forecast",
+            mode="lines",
+            line=dict(color="red"),
+        ),
+        go.Scatter(
+            x=df.index,
+            y=y_predicted,
+            name="Test Predictions",
+            mode="lines",
+            line=dict(color="green"),
+        ),
+    ]
+)
 
-# Create figure
-fig_candlestick = go.Figure(data=[trace_original, trace_predicted], layout=layout)
 
 # Show the candlestick chart
-st.plotly_chart(fig_candlestick)
+st.plotly_chart(fig_pred)
 #except:
     #st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
+    
