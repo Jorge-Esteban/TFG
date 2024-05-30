@@ -1,42 +1,61 @@
 import streamlit as st
-import pandas as pd
 from pandas_datareader import data as pdr
+import yfinance as yf  
+import datetime as dt
 import requests
-from PIL import Image
 import io
-import yfinance as yf 
+from PIL import Image 
 
-# Función para mostrar imágenes desde enlaces
+# Variables
+max_end = dt.datetime.now().date()
+min_start = dt.datetime(2012, 1, 1).date()
+
+# Function to show image from link
 def show_image_from_link(link, caption=None):
     r = requests.get(link)
     img = Image.open(io.BytesIO(r.content))
     st.image(img, caption=caption, use_column_width=True)
 
-# Función para mostrar las noticias relacionadas con un ticker
-def mostrar_noticias(ticker):
-    # Aquí podrías llamar a tu función o API para obtener las noticias relacionadas con el ticker
-    pass
 
-# Título
-st.title('Stock Price Prediction App')
 
-# Barra lateral para introducir el ticker
-ticker_input = st.sidebar.text_input("Introduce el ticker", value="AAPL")
-search_button = st.sidebar.button("Buscar")
-
-# Si se hace clic en el botón de búsqueda, mostrar las noticias relacionadas con el ticker
-if search_button:
-    st.write(f"Noticias relacionadas con el ticker: {ticker_input}")
-    mostrar_noticias(ticker_input)
-
-# Preparación de datos
+# Prepare Data
 yf.pdr_override()
-Ticker = ticker_input
-stock_data = yf.Ticker(Ticker)
 
-# Mostrar datos
-df = pdr.get_data_yahoo(Ticker)
+# Function to fetch data
+try:
+    def fetch_data(ticker):
+        stock_data = yf.Ticker(ticker)
+        df = pdr.get_data_yahoo(ticker)
+        return stock_data, df
 
-# Descripción de datos
-st.subheader(stock_data.info['longName']+"("+Ticker)
-st.write(stock_data.news)
+# Sidebar for entering stock ticker
+    ticker_input = st.sidebar.text_input('Enter the stock ticker:', st.query_params.get("ticker", "AAPL"))
+
+# Fetching the data
+    stock_data, df = fetch_data(ticker_input)
+
+# Title
+
+    st.title(stock_data.info['longName'] + "(" + ticker_input + ") Latest News")
+
+
+    # Function to display news
+    def show_news(noticia):
+        with st.container(border=True):
+            st.header(noticia['title'], anchor=noticia['link'], divider=True)
+            st.caption(noticia['publisher'] + " for " + noticia['publisher'])
+            # Check if 'thumbnail' exists and has proper resolutions
+            if 'thumbnail' in noticia and noticia['thumbnail'] and 'resolutions' in noticia['thumbnail'] and noticia['thumbnail']['resolutions']:
+                show_image_from_link(noticia['thumbnail']['resolutions'][0]['url'])
+            st.write("[Link to the news](%s)" % noticia['link'])
+            # Show related tickers
+            st.divider()
+            if noticia['relatedTickers']:
+                tickers = ', '.join([f"[{ticker}](/News2?ticker={ticker})" for ticker in noticia['relatedTickers']])
+                st.markdown(f"**Related Stocks:** {tickers}")
+
+    # Iterate over news and display
+    for noticia in stock_data.news:
+        show_news(noticia)
+except : 
+    st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
