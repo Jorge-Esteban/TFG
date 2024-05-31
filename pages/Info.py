@@ -7,8 +7,8 @@ import streamlit as st
 import datetime as dt
 import streamlit_card as stc
 from streamlit_extras.grid import grid
-
-
+import requests
+import streamlit.components.v1 as components
 #Variables
 end = dt.datetime.now().date()
 start = dt.datetime(2012,1,1).date()
@@ -23,6 +23,27 @@ Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
 stock_data = yf.Ticker(Ticker)
 df_instHolders = stock_data.institutional_holders
 df_balancesheet = stock_data.balancesheet
+
+class Tweet(object):
+    def __init__(self, s, embed_str=False):
+        if not embed_str:
+            # Use Twitter's oEmbed API
+            # https://dev.twitter.com/web/embedded-tweets
+            api = "https://publish.twitter.com/oembed?url={}".format(s)
+            response = requests.get(api)
+            self.text = response.json()["html"]
+        else:
+            self.text = s
+
+    def _repr_html_(self):
+        return self.text
+
+    def component(self):
+        return components.html(self.text, height=600)
+
+
+t = Tweet("https://twitter.com/OReillyMedia/status/901048172738482176").component()
+
 def format_shares_money(x):
         if x >= 1e9:  # If value is greater than or equal to 1 billion
             return '{:.2f}B'.format(x / 1e9)
@@ -79,7 +100,10 @@ if 'longBusinessSummary' in stock_data.info:
 #Holders
 clean_institutional_holders(df_instHolders)
 st.subheader('Major institutonial investors:')
-st.table(df_instHolders.style.background_gradient(cmap='Blues'))
+st.table(
+   df_instHolders.style.highlight_max(['Shares'], color='green')
+)
+
 
 #Main officers
 st.subheader('Main officers:')
@@ -94,3 +118,4 @@ if 'companyOfficers' in stock_data.info:
             if i + j < num_officers:
                 with cols[j]:
                     show_officer(officers[i + j])
+

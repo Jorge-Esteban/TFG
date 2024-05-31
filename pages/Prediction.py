@@ -114,7 +114,7 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 
 #Load model
 select_model = st.selectbox('Choose your model',('Slow and scatter','Fast and accurate') )
-if select_model == 'Fast and scatter' : 
+if select_model == 'Slow and scatter' : 
     model = load_model('stock_prediction.h5') 
 else :
     model = load_model('stock_prediction2.h5') 

@@ -67,7 +67,8 @@ metrics_compare = {
 metrics_technical= {
     '20-Day Moving Average' : lambda x: x['Close'].rolling(20).mean().iloc[-1],
     '50-Day Moving Average' : lambda x: x['Close'].rolling(50).mean().iloc[-1],
-    '100-Day Moving Average' : lambda x: x['Close'].rolling(100).mean().iloc[-1]  
+    '100-Day Moving Average' : lambda x: x['Close'].rolling(100).mean().iloc[-1],
+    'Percent change':  lambda x : x['Close'].pct_change()
 }
 metric_recommendation= {
     'Strong buy': lambda x: x.recommendations['strongBuy'].iloc[2],
