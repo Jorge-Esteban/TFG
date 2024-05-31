@@ -89,24 +89,17 @@ st.plotly_chart(fig, use_container_width=True)
 #######################################
 ####        THE PREDICTION         ####
 #######################################
-
+st.markdown("## **Stock Prediction**")
 #Splitting Data into Training and Testing
 data_training = pd.DataFrame(df['Close'][0:int(len(df)*0.70)])
 data_testing = pd.DataFrame(df['Close'][int(len(df)*0.70):int(len(df))])
 
 scaler = MinMaxScaler(feature_range=(0,1))
-
 data_training_array = scaler.fit_transform(data_training)
 
-    #Splitting Data into Training and Testing
+#Splitting Data into Training and Testing
 data_training = pd.DataFrame(df['Close'][0:int(len(df)*0.70)])
 data_testing = pd.DataFrame(df['Close'][int(len(df)*0.70):int(len(df))])
-
-
-from sklearn.preprocessing import MinMaxScaler
-scaler = MinMaxScaler(feature_range=(0,1))
-
-data_training_array = scaler.fit_transform(data_training)
 
 #Splitting Data into x_train and y_train
 x_train = []
@@ -120,8 +113,11 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 
 
 #Load model
-model = load_model('stock_prediction.h5')
-
+select_model = st.selectbox('Choose your model',('Slow and scatter','Fast and accurate') )
+if select_model == 'Fast and scatter' : 
+    model = load_model('stock_prediction.h5') 
+else :
+    model = load_model('stock_prediction2.h5') 
 
 #Testing part
 past_100_days = data_training.tail(100)
@@ -142,79 +138,28 @@ scaler = scaler.scale_
 scale_factor = 1/scaler[0]
 y_predicted = y_predicted*scale_factor
 y_test = y_test*scale_factor
-st.write()
 
-# Forecasting the next 25 days
-last_100_days = input_data[-100:]  # Last 100 days from the input data
-
-forecast = []
-for _ in range(25):
-    next_pred = model.predict(last_100_days.reshape(1, 100, 1))
-    forecast.append(next_pred[0, 0])
-    next_pred_scaled = next_pred / scale_factor
-    last_100_days = np.append(last_100_days, next_pred_scaled)[1:]
-
-# Scale forecast back to original values
-forecast = np.array(forecast) * scale_factor
-
-# Append forecast to y_predicted DataFrame
-dates = pd.date_range(start=df.index[-1], periods=25)
-forecast_df = pd.DataFrame(forecast, index=dates, columns=['Forecast'])
-
-# Combine actual predictions with forecast
-y_pred_df = pd.DataFrame(y_predicted, index=data_testing.index, columns=['Predicted'])
-combined_df = y_pred_df.append(forecast_df)
-st.dataframe(y_predicted)
 
 #Final Graph
-st.subheader('Predictions vs Original')
-fig2 = plt.figure(figsize=(10,6))
-plt.plot(y_test, 'b', label= 'Original Price')
-plt.plot(y_predicted, 'r', label= 'Predicted Price')
-plt.xlabel('Time')
-plt.ylabel('Price')
-plt.legend()
-plt.style.use('dark_background')
-st.pyplot(fig=fig2)
-bytes = io.BytesIO()
-plt.savefig(bytes, format="png")
-Graph_img = base64.b64encode(bytes.read())
-
-st.download_button("Download Graph", Graph_img, "PredictionVsOriginal")
-
-st.markdown("## **Stock Prediction**")
-
+y_test_df = pd.DataFrame(y_test)
+y_predicted_df = pd.DataFrame(y_predicted)
 # Create a plot for the stock prediction
 fig_pred = go.Figure(
     data=[
         go.Scatter(
             x=df.index,
-            y=df["Close"],
+            y=y_test_df[0],
             name="Train",
             mode="lines",
             line=dict(color="blue"),
         ),
         go.Scatter(
             x=df.index,
-            y=y_predicted["Close"],
-            name="Test",
-            mode="lines",
-            line=dict(color="orange"),
-        ),
-        go.Scatter(
-            x=df.index,
-            y=x_train,
+            y=y_predicted_df[0],
             name="Forecast",
             mode="lines",
             line=dict(color="red"),
-        ),
-        go.Scatter(
-            x=df.index,
-            y=y_predicted,
-            name="Test Predictions",
-            mode="lines",
-            line=dict(color="green"),
-        ),
+        )
     ]
 )
 
