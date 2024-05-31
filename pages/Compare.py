@@ -10,6 +10,7 @@ import streamlit as st
 import datetime as dt
 import plotly.express as px
 
+st.set_page_config(page_icon="🔀", page_title='StockComparison')
 #Variables
 max_end = dt.datetime.now().date()
 min_start = dt.datetime(2012,1,1).date()

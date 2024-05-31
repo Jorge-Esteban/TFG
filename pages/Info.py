@@ -9,6 +9,9 @@ import streamlit_card as stc
 from streamlit_extras.grid import grid
 import requests
 import streamlit.components.v1 as components
+
+st.set_page_config(page_icon="📈", page_title='StockInfo')
+
 #Variables
 end = dt.datetime.now().date()
 start = dt.datetime(2012,1,1).date()

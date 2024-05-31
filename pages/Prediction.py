@@ -12,6 +12,8 @@ import streamlit as st
 import datetime as dt
 import io
 import base64
+
+st.set_page_config(page_icon="🔮", page_title='StockAIPrediction')
 #Variables
 max_end = dt.datetime.now().date()
 min_start = dt.datetime(2012,1,1).date()

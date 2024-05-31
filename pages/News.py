@@ -6,6 +6,7 @@ import requests
 import io
 from PIL import Image 
 
+st.set_page_config(page_icon="📰", page_title='StockNews')
 # Variables
 max_end = dt.datetime.now().date()
 min_start = dt.datetime(2012, 1, 1).date()
