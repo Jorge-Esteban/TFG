@@ -24,9 +24,6 @@ def format_shares_money(x):
         else:
             return '{:.2f}'.format(x)
 
-def style_dataframe(df: pd.DataFrame)-> pd.io.formats.style.Styler:
-    df = df.style.background_gradient(cmap='Blues') 
-
 try:   
     #Título
     st.title('Stock Price Prediction App')

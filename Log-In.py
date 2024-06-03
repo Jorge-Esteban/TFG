@@ -12,4 +12,3 @@ LOGGED_IN = __login__obj.build_login_ui()
 
 if LOGGED_IN == True:
     st.markdown("Your Streamlit Application Begins here!")
-    st.switch_page("pages/Hello.py")
