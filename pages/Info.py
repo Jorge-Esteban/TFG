@@ -12,21 +12,7 @@ import streamlit.components.v1 as components
 import re
 st.set_page_config(page_icon="📈", page_title='StockInfo')
 
-#Variables
-end = dt.datetime.now().date()
-start = dt.datetime(2012,1,1).date()
-
-#Título
-st.title('Stock Price Prediction App')
-
-#Preparacion Datos
-
-yf.pdr_override()
-Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
-stock_data = yf.Ticker(Ticker)
-df_instHolders = stock_data.institutional_holders
-df_balancesheet = stock_data.balancesheet
-
+#Functions
 def format_shares_money(x):
         if x >= 1e9:  # If value is greater than or equal to 1 billion
             return '{:.2f}B'.format(x / 1e9)
@@ -54,51 +40,70 @@ def show_officer(officer):
                 st.write("Age:, ",officer['age'])
             if'totalPay' in officer:
                 st.write("Anual pay: ", officer['totalPay'])
-    
-# new_column_names = [str(col)[:4] for col in df_balancesheet.columns]
-# new_column_names
-# df_balancesheet.rename(columns=new_column_names, inplace=True)
-df_balancesheet = df_balancesheet.iloc[:,0]
-st.table(df_balancesheet)
+                
+#Variables
+end = dt.datetime.now().date()
+start = dt.datetime(2012,1,1).date()
 
-#Describing data
-if 'longName' and 'website' in stock_data.info:
-    st.subheader(stock_data.info['longName']+"("+Ticker + ") Stock data from " + str(start))
-elif 'longName' in stock_data:
-    st.subheader(stock_data.info['longName']+"("+Ticker + ") Stock data from "+ str(start))
-if 'city' and 'address1' and 'country' and 'industry' and 'sector' in stock_data.info:
-    st.write('Located at: ' + stock_data.info['address1'] , ", " , stock_data.info['city'] , ', ' , stock_data.info['country'])
-    st.write('Industry: ' , stock_data.info['industry'])
-    st.write('Sector: ', stock_data.info['sector'])
-if 'website' in stock_data.info:
-    st.write("[Link to website](%s)" % stock_data.info['website'])
-if 'irWebsite' in stock_data.info:
-    st.write("[Link to investor relations website](%s)" % stock_data.info['irWebsite'])
-    
-#Description  
-if 'longBusinessSummary' in stock_data.info:            
-    with st.container(border=True):
-        st.write(stock_data.info['longBusinessSummary'])  
+try:
+    #Título
+    st.title('Stock Price Prediction App')
 
-#Holders
-clean_institutional_holders(df_instHolders)
-st.subheader('Major institutonial investors:')
-st.table(
-   df_instHolders.style.highlight_max(['Shares'], color='green')
-)
+    #Preparacion Datos
+
+    yf.pdr_override()
+    Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
+    stock_data = yf.Ticker(Ticker)
+    df_balancesheet = stock_data.balancesheet
 
 
-#Main officers
-st.subheader('Main officers:')
-if 'companyOfficers' in stock_data.info:           
-    officers = stock_data.info['companyOfficers']
-    num_columns = 2
-    num_officers = len(officers)
+    #Describing data
+    if 'longName' and 'website' in stock_data.info:
+        st.subheader(stock_data.info['longName']+"("+Ticker + ") Info:")
+    elif 'longName' in stock_data:
+        st.subheader(stock_data.info['longName']+"("+Ticker + ") Stock data from "+ str(start))
+    if 'city' and 'address1' and 'country' and 'industry' and 'sector' in stock_data.info:
+        st.write('Located at: ' + stock_data.info['address1'] , ", " , stock_data.info['city'] , ', ' , stock_data.info['country'])
+        st.write('Industry: ' , stock_data.info['industry'])
+        st.write('Sector: ', stock_data.info['sector'])
+    if 'website' in stock_data.info:
+        st.write("[Link to website](%s)" % stock_data.info['website'])
+    if 'irWebsite' in stock_data.info:
+        st.write("[Link to investor relations website](%s)" % stock_data.info['irWebsite'])
+        
+    #Description  
+    if 'longBusinessSummary' in stock_data.info:            
+        with st.container(border=True):
+            st.write(stock_data.info['longBusinessSummary'])  
 
-    for i in range(0, num_officers, num_columns):
-        cols = st.columns(num_columns)
-        for j in range(num_columns):
-            if i + j < num_officers:
-                with cols[j]:
-                    show_officer(officers[i + j])
+    #Holders
+    try:
+        df_instHolders = stock_data.institutional_holders   
+        clean_institutional_holders(df_instHolders)
+        st.subheader('Major institutonial investors:')
+        st.table(
+        df_instHolders
+        )
+    except: 
+        st.write('**No institutional holders declared**')
 
+
+    #Main officers
+    st.subheader('Main officers:')
+    if 'companyOfficers' in stock_data.info:           
+        officers = stock_data.info['companyOfficers']
+        num_columns = 2
+        num_officers = len(officers)
+
+        for i in range(0, num_officers, num_columns):
+            cols = st.columns(num_columns)
+            for j in range(num_columns):
+                if i + j < num_officers:
+                    with cols[j]:
+                        show_officer(officers[i + j])
+
+    df_balancesheet = df_balancesheet.iloc[:,0]
+    st.subheader('Balance sheet', divider=True)
+    st.table(df_balancesheet)
+except:
+    st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")

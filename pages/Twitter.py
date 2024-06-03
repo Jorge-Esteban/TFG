@@ -1,16 +1,6 @@
-from collections import defaultdict, namedtuple
-from htbuilder import div, big, h2, styles
-from htbuilder.units import rem
-from math import floor
-from textblob import TextBlob
-import altair as alt
-import datetime
-import functools
-import pandas as pd
+
 import re
 import streamlit as st
-import time
-import tweepy
 import requests
 import streamlit.components.v1 as components
 import yfinance as yf
@@ -45,9 +35,9 @@ def show_tweets(json):
         if ('media' in json['timeline'][i]['entities']) and ('expanded_url' in json['timeline'][i]['entities']['media'][0]):
             x_url = json['timeline'][i]['entities']['media'][0]['expanded_url']
             x_url = remove_media_suffix(x_url)
-            st.write(x_url)
             t = Tweet(x_url).component()
-           
+
+        
 url = "https://twitter-api45.p.rapidapi.com/search.php"
 headers = {
 	"X-RapidAPI-Key": "ebc2ec0c66msh8dda3e993fd9656p15b077jsn24ab995c70df",
@@ -59,11 +49,8 @@ querystring = {"query":'$'+Ticker}
 
 try:
     st.title(stock_data.info['longName'] + "(" + Ticker + ") Latest News on X")
-
-
     response = requests.get(url, headers=headers, params=querystring)
     response_json = response.json()
-
     show_tweets(response_json)
 except:
     st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
