@@ -13,17 +13,8 @@ import time
 import tweepy
 import requests
 import streamlit.components.v1 as components
-st.set_page_config(page_icon="🐤", page_title="Twitter Sentiment Analyzer")
-
-consumer_key="PHvbXVcMWNhKZwL3p5CkNa0Az"
-consumer_secret="6G8EGd9urlm5BT15WzyORVHz8rQkDqqlRiKouIwkBwlZhYNEqQ"
-access_token="714872719393886208-RpOxyxuc6M0BajNvCg4FMs9xw5yDB12"
-access_token_secret="by9SF8FEpzzlwJ8oSFMqIwmcqTLcBHlRcYK0n0uSSGkrh"
-BearerToken = 'AAAAAAAAAAAAAAAAAAAAACREuAEAAAAA%2BafTUAhckfYMx1M5ymwK2cexTLQ%3DObJatBRgtOjfKU8uxbhi8F3Uh4TadH3xPmLU41KyZfKCNOQweu'
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-api = tweepy.API(auth)
-
+import yfinance as yf
+st.set_page_config(page_icon="🐤", page_title="Twitter Feed")
 
 class Tweet(object):
     def __init__(self, s, embed_str=False):
@@ -41,28 +32,38 @@ class Tweet(object):
 
     def component(self):
         return components.html(self.text, height=600)
-
-
-t = Tweet("https://twitter.com/OReillyMedia/status/901048172738482176").component()
-
-
-
-if api.verify_credentials :
-    st.write('Credentials work!')
-
-# Define the search query
-search_query = '$AAPL'
-
-# Collect tweets
-tweets = tweepy.Cursor(api.search_tweets, q=search_query, lang='en').items(5)
-# Print the collected tweets
-for tweet in tweets:
-    st.write(tweet.full_text)
-    st.write('-' * 50)# Collect tweets
     
-tweets = tweepy.Cursor(api.search_tweets, q=search_query, lang='en').items(5)
-# Print the collected tweets
-for tweet in tweets:
-    st.write(tweet.full_text)
-    st.write('-' * 50)
-    
+def remove_media_suffix(url):
+    # Define a regular expression pattern to match the /photo/1 or /video/1 part at the end of the URL
+    pattern = r'(/(?:photo|video)/\d+)$'
+    # Use re.sub to replace the pattern with an empty string
+    cleaned_url = re.sub(pattern, '', url)
+    return cleaned_url
+
+def show_tweets(json):
+    for i in range(10):
+        if ('media' in json['timeline'][i]['entities']) and ('expanded_url' in json['timeline'][i]['entities']['media'][0]):
+            x_url = json['timeline'][i]['entities']['media'][0]['expanded_url']
+            x_url = remove_media_suffix(x_url)
+            st.write(x_url)
+            t = Tweet(x_url).component()
+           
+url = "https://twitter-api45.p.rapidapi.com/search.php"
+headers = {
+	"X-RapidAPI-Key": "ebc2ec0c66msh8dda3e993fd9656p15b077jsn24ab995c70df",
+	"X-RapidAPI-Host": "twitter-api45.p.rapidapi.com"
+}
+Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
+stock_data = yf.Ticker(Ticker)
+querystring = {"query":'$'+Ticker}
+
+try:
+    st.title(stock_data.info['longName'] + "(" + Ticker + ") Latest News on X")
+
+
+    response = requests.get(url, headers=headers, params=querystring)
+    response_json = response.json()
+
+    show_tweets(response_json)
+except:
+    st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")

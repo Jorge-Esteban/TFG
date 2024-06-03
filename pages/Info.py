@@ -9,7 +9,7 @@ import streamlit_card as stc
 from streamlit_extras.grid import grid
 import requests
 import streamlit.components.v1 as components
-
+import re
 st.set_page_config(page_icon="📈", page_title='StockInfo')
 
 #Variables
@@ -26,26 +26,6 @@ Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
 stock_data = yf.Ticker(Ticker)
 df_instHolders = stock_data.institutional_holders
 df_balancesheet = stock_data.balancesheet
-
-class Tweet(object):
-    def __init__(self, s, embed_str=False):
-        if not embed_str:
-            # Use Twitter's oEmbed API
-            # https://dev.twitter.com/web/embedded-tweets
-            api = "https://publish.twitter.com/oembed?url={}".format(s)
-            response = requests.get(api)
-            self.text = response.json()["html"]
-        else:
-            self.text = s
-
-    def _repr_html_(self):
-        return self.text
-
-    def component(self):
-        return components.html(self.text, height=600)
-
-
-t = Tweet("https://twitter.com/OReillyMedia/status/901048172738482176").component()
 
 def format_shares_money(x):
         if x >= 1e9:  # If value is greater than or equal to 1 billion
