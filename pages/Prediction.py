@@ -2,7 +2,6 @@
 import pandas as pd
 from pandas_datareader import data as pdr
 import numpy as np
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px
 import yfinance as yf  
@@ -23,7 +22,7 @@ try:
 
     #Preparacion Datos
     yf.pdr_override()
-    Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
+    Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL').rstrip().strip()
     #try:
     stock_data = yf.Ticker(Ticker)
 

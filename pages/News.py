@@ -30,7 +30,7 @@ try:
         return stock_data, df
 
 # Sidebar for entering stock ticker
-    ticker_input = st.sidebar.text_input('Enter the stock ticker:', st.query_params.get("ticker", "AAPL"))
+    ticker_input = st.sidebar.text_input('Enter the stock ticker:', st.query_params.get("ticker", "AAPL")).rstrip().strip()
 
 # Fetching the data
     stock_data, df = fetch_data(ticker_input)

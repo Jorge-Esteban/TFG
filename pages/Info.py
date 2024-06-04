@@ -2,6 +2,7 @@ import pandas as pd
 from pandas_datareader import data as pdr
 import numpy as np
 import yfinance as yf
+import plotly.graph_objects as go
 from tensorflow.python.keras.models import load_model
 import streamlit as st
 import datetime as dt
@@ -52,8 +53,9 @@ try:
     #Preparacion Datos
 
     yf.pdr_override()
-    Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
+    Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL').rstrip().strip()
     stock_data = yf.Ticker(Ticker)
+    df = pdr.get_data_yahoo(Ticker,start,end)
     df_balancesheet = stock_data.balancesheet
 
 
@@ -102,6 +104,22 @@ try:
                     with cols[j]:
                         show_officer(officers[i + j])
 
+    #Historical Data
+    st.markdown("## **Historical Data**")
+
+    # Create a plot for the historical data
+    fig = go.Figure(
+        data=[
+            go.Candlestick(
+                x=df.index,
+                open=df["Open"],
+                high=df["High"],
+                low=df["Low"],
+                close=df["Close"],
+            )
+        ]
+    )
+    #Balancesheet
     df_balancesheet = df_balancesheet.iloc[:,0]
     st.subheader('Balance sheet', divider=True)
     st.table(df_balancesheet)

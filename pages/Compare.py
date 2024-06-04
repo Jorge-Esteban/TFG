@@ -30,8 +30,8 @@ try:
 
     ##Collecting data...
     yf.pdr_override()
-    Ticker1 = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
-    Ticker2 = st.sidebar.text_input('Enter the stock ticker:', 'TSLA')
+    Ticker1 = st.sidebar.text_input('Enter the stock ticker:', 'AAPL').rstrip().strip()
+    Ticker2 = st.sidebar.text_input('Enter the stock ticker:', 'TSLA').rstrip().strip()
     stock_data1 = yf.Ticker(Ticker1)
     stock_data2 = yf.Ticker(Ticker2)
 
