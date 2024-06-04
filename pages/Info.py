@@ -47,83 +47,84 @@ end = dt.datetime.now().date()
 start = dt.datetime(2012,1,1).date()
 
 try:
-    
-    #Título
-    st.title('Stock Price Prediction App')
+    if st.session_state['Login'] == True:
+        #Título
+        st.title('Stock Price Prediction App')
 
-    #Preparacion Datos
+        #Preparacion Datos
 
-    yf.pdr_override()
-    Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL').rstrip().strip()
-    stock_data = yf.Ticker(Ticker)
-    df = pdr.get_data_yahoo(Ticker,start,end)
-    df_balancesheet = stock_data.balancesheet
-
-
-    #Describing data
-    if 'longName' and 'website' in stock_data.info:
-        st.subheader(stock_data.info['longName']+"("+Ticker + ") Info:")
-    elif 'longName' in stock_data:
-        st.subheader(stock_data.info['longName']+"("+Ticker + ") Stock data from "+ str(start))
-    if 'city' and 'address1' and 'country' and 'industry' and 'sector' in stock_data.info:
-        st.write('Located at: ' + stock_data.info['address1'] , ", " , stock_data.info['city'] , ', ' , stock_data.info['country'])
-        st.write('Industry: ' , stock_data.info['industry'])
-        st.write('Sector: ', stock_data.info['sector'])
-    if 'website' in stock_data.info:
-        st.write("[Link to website](%s)" % stock_data.info['website'])
-    if 'irWebsite' in stock_data.info:
-        st.write("[Link to investor relations website](%s)" % stock_data.info['irWebsite'])
-        
-    #Description  
-    if 'longBusinessSummary' in stock_data.info:            
-        with st.container(border=True):
-            st.write(stock_data.info['longBusinessSummary'])  
-
-    #Holders
-    try:
-        df_instHolders = stock_data.institutional_holders   
-        clean_institutional_holders(df_instHolders)
-        st.subheader('Major institutonial investors:')
-        st.table(
-        df_instHolders
-        )
-    except: 
-        st.write('**No institutional holders declared**')
+        yf.pdr_override()
+        Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL').rstrip().strip()
+        stock_data = yf.Ticker(Ticker)
+        df = pdr.get_data_yahoo(Ticker,start,end)
+        df_balancesheet = stock_data.balancesheet
 
 
-    #Main officers
-    st.subheader('Main officers:')
-    if 'companyOfficers' in stock_data.info:           
-        officers = stock_data.info['companyOfficers']
-        num_columns = 2
-        num_officers = len(officers)
+        #Describing data
+        if 'longName' and 'website' in stock_data.info:
+            st.subheader(stock_data.info['longName']+"("+Ticker + ") Info:")
+        elif 'longName' in stock_data:
+            st.subheader(stock_data.info['longName']+"("+Ticker + ") Stock data from "+ str(start))
+        if 'city' and 'address1' and 'country' and 'industry' and 'sector' in stock_data.info:
+            st.write('Located at: ' + stock_data.info['address1'] , ", " , stock_data.info['city'] , ', ' , stock_data.info['country'])
+            st.write('Industry: ' , stock_data.info['industry'])
+            st.write('Sector: ', stock_data.info['sector'])
+        if 'website' in stock_data.info:
+            st.write("[Link to website](%s)" % stock_data.info['website'])
+        if 'irWebsite' in stock_data.info:
+            st.write("[Link to investor relations website](%s)" % stock_data.info['irWebsite'])
+            
+        #Description  
+        if 'longBusinessSummary' in stock_data.info:            
+            with st.container(border=True):
+                st.write(stock_data.info['longBusinessSummary'])  
 
-        for i in range(0, num_officers, num_columns):
-            cols = st.columns(num_columns)
-            for j in range(num_columns):
-                if i + j < num_officers:
-                    with cols[j]:
-                        show_officer(officers[i + j])
-
-    #Historical Data
-    st.markdown("## **Historical Data**")
-
-    # Create a plot for the historical data
-    fig = go.Figure(
-        data=[
-            go.Candlestick(
-                x=df.index,
-                open=df["Open"],
-                high=df["High"],
-                low=df["Low"],
-                close=df["Close"],
+        #Holders
+        try:
+            df_instHolders = stock_data.institutional_holders   
+            clean_institutional_holders(df_instHolders)
+            st.subheader('Major institutonial investors:')
+            st.table(
+            df_instHolders
             )
-        ]
-    )
-    #Balancesheet
-    df_balancesheet = df_balancesheet.iloc[:,0]
-    st.subheader('Balance sheet', divider=True)
-    st.table(df_balancesheet)
-    
+        except: 
+            st.write('**No institutional holders declared**')
+
+
+        #Main officers
+        st.subheader('Main officers:')
+        if 'companyOfficers' in stock_data.info:           
+            officers = stock_data.info['companyOfficers']
+            num_columns = 2
+            num_officers = len(officers)
+
+            for i in range(0, num_officers, num_columns):
+                cols = st.columns(num_columns)
+                for j in range(num_columns):
+                    if i + j < num_officers:
+                        with cols[j]:
+                            show_officer(officers[i + j])
+
+        #Historical Data
+        st.markdown("## **Historical Data**")
+
+        # Create a plot for the historical data
+        fig = go.Figure(
+            data=[
+                go.Candlestick(
+                    x=df.index,
+                    open=df["Open"],
+                    high=df["High"],
+                    low=df["Low"],
+                    close=df["Close"],
+                )
+            ]
+        )
+        #Balancesheet
+        df_balancesheet = df_balancesheet.iloc[:,0]
+        st.subheader('Balance sheet', divider=True)
+        st.table(df_balancesheet)
+    else:
+        st.page_link("LogIn.py", label="LogIn first please")
 except:
     st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")

@@ -12,7 +12,10 @@ __login__obj = __login__(auth_token = "pk_prod_DRG0PSRH78M3WNQF5VKYBN5BSAYN",
 LOGGED_IN = __login__obj.build_login_ui()
 
 if LOGGED_IN == True:
+    st.session_state['Login'] = True
     st.markdown("Your Streamlit Application Begins here!")
     with st.spinner('Wait for it...'):
         time.sleep(5)
         st.switch_page("pages/Hello.py")
+else:
+    st.session_state['Login'] = False
