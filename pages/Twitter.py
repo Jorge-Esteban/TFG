@@ -46,15 +46,14 @@ headers = {
 
 
 try:
-    if LogIn.LOGGED_IN:
-        Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
-        stock_data = yf.Ticker(Ticker)
-        querystring = {"query":'$'+Ticker}
-        st.title(stock_data.info['longName'] + "(" + Ticker + ") Latest News on X")
-        response = requests.get(url, headers=headers, params=querystring)
-        response_json = response.json()
-        show_tweets(response_json)
-    else :
-        st.page_link("LogIn.py",label='Log In to access the app ')
+
+    Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
+    stock_data = yf.Ticker(Ticker)
+    querystring = {"query":'$'+Ticker}
+    st.title(stock_data.info['longName'] + "(" + Ticker + ") Latest News on X")
+    response = requests.get(url, headers=headers, params=querystring)
+    response_json = response.json()
+    show_tweets(response_json)
+
 except:
     st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
