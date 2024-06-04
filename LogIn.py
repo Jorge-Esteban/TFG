@@ -10,8 +10,9 @@ __login__obj = __login__(auth_token = "pk_prod_0EDPKCYQBF472VHQ6J6FCNE24K4Q",
                     lottie_url = 'https://assets2.lottiefiles.com/packages/lf20_jcikwtux.json')
 
 LOGGED_IN = __login__obj.build_login_ui()
-
+global status_check 
 if LOGGED_IN == True:
+    status_check = True
     st.markdown("Your Streamlit Application Begins here!")
     with st.spinner('Wait for it...'):
         time.sleep(5)

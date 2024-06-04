@@ -1,4 +1,4 @@
-
+import LogIn
 import re
 import streamlit as st
 import requests
@@ -37,20 +37,24 @@ def show_tweets(json):
             x_url = remove_media_suffix(x_url)
             t = Tweet(x_url).component()
 
-        
+       
 url = "https://twitter-api45.p.rapidapi.com/search.php"
 headers = {
 	"X-RapidAPI-Key": "ebc2ec0c66msh8dda3e993fd9656p15b077jsn24ab995c70df",
 	"X-RapidAPI-Host": "twitter-api45.p.rapidapi.com"
 }
-Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
-stock_data = yf.Ticker(Ticker)
-querystring = {"query":'$'+Ticker}
+
 
 try:
-    st.title(stock_data.info['longName'] + "(" + Ticker + ") Latest News on X")
-    response = requests.get(url, headers=headers, params=querystring)
-    response_json = response.json()
-    show_tweets(response_json)
+    if LogIn.LOGGED_IN:
+        Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL')
+        stock_data = yf.Ticker(Ticker)
+        querystring = {"query":'$'+Ticker}
+        st.title(stock_data.info['longName'] + "(" + Ticker + ") Latest News on X")
+        response = requests.get(url, headers=headers, params=querystring)
+        response_json = response.json()
+        show_tweets(response_json)
+    else :
+        st.page_link("LogIn.py",label='Log In to access the app ')
 except:
     st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
