@@ -18,6 +18,6 @@ if LOGGED_IN == True:
     st.markdown("Your Streamlit Application Begins here!")
     with st.spinner('Wait for it...'):
         time.sleep(5)
-        st.switch_page("pages/Hello.py")
+        st.switch_page("pages/01Hello.py")
 else:
     st.session_state['Login'] = False
