@@ -1,16 +1,12 @@
-import pandas as pd
 from pandas_datareader import data as pdr
-import numpy as np
 import yfinance as yf
 import plotly.graph_objects as go
 from tensorflow.python.keras.models import load_model
 import streamlit as st
 import datetime as dt
-import streamlit_card as stc
 from streamlit_extras.grid import grid
-import requests
-import streamlit.components.v1 as components
-import LogIn
+
+
 st.set_page_config(page_icon="📈", page_title='StockInfo')
 
 #Functions
@@ -52,7 +48,6 @@ try:
         st.title('Stock Price Prediction App')
 
         #Preparacion Datos
-
         yf.pdr_override()
         Ticker = st.sidebar.text_input('Enter the stock ticker:', 'AAPL').rstrip().strip()
         stock_data = yf.Ticker(Ticker)

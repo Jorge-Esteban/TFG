@@ -1,7 +1,6 @@
 #python -m streamlit run app.py
 import pandas as pd
 from pandas_datareader import data as pdr
-import LogIn
 import yfinance as yf  
 from tensorflow.python.keras.models import load_model
 import streamlit as st
@@ -152,7 +151,7 @@ try:
 
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.page_link("LogIn.py", label="LogIn first please")
+        st.page_link("LogIn.py", label="LogIn first please", icon="👩‍💻")
     
 except : 
    st.write("Sorry, either one or both of the selected stock doesn't exist or there is no data. Try again please.")

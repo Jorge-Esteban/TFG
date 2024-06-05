@@ -1,7 +1,9 @@
 import streamlit as st
+import streamlit_parameters
 from streamlit_login_auth_ui.widgets import __login__
 from st_pages import hide_pages
 import time
+
 __login__obj = __login__(auth_token = "pk_prod_DRG0PSRH78M3WNQF5VKYBN5BSAYN", 
                     company_name = "Stock Prediction App Team",
                     width = 200, height = 250, 

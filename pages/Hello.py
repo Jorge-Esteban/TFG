@@ -14,8 +14,6 @@ def main():
         st.page_link("pages/Prediction.py", label="Go to the Prediction page", icon="🔮")
         st.page_link("pages/News.py", label="Go to the News page", icon="📰")
         st.page_link("pages/Twitter.py", label="Go to Twitter News page", icon="🐤")
-    else:
-        st.page_link("LogIn.py", label="LogIn first please")
 
 if __name__ == "__main__":
     main()
