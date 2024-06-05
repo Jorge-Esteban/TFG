@@ -38,8 +38,9 @@ def show_tweets(json):
 
        
 url = "https://twitter-api45.p.rapidapi.com/search.php"
+st.secrets["api_key"] = "ebc2ec0c66msh8dda3e993fd9656p15b077jsn24ab995c70df"
 headers = {
-	"X-RapidAPI-Key": "ebc2ec0c66msh8dda3e993fd9656p15b077jsn24ab995c70df",
+	"X-RapidAPI-Key": st.secrets.api_key,
 	"X-RapidAPI-Host": "twitter-api45.p.rapidapi.com"
 }
 
