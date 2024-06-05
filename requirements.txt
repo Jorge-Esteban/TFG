@@ -1,0 +1,12 @@
+streamlit
+pandas_datareader
+yfinance
+plotly
+tensorflow
+streamlit-extras
+pandas
+numpy
+netron
+scikit-learn
+requests
+Pillow
