@@ -10,8 +10,8 @@ def main():
     
     if st.session_state['Login'] == True:
         st.page_link("pages/Info.py", label="Go to the Info page", icon="📈")
-        st.page_link("pages/Compare.py", label="Go to the Compare page", icon="🔀")
         st.page_link("pages/Prediction.py", label="Go to the Prediction page", icon="🔮")
+        st.page_link("pages/Compare.py", label="Go to the Compare page", icon="🔀")
         st.page_link("pages/News.py", label="Go to the News page", icon="📰")
         st.page_link("pages/Twitter.py", label="Go to Twitter News page", icon="🐤")
 
