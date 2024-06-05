@@ -4,6 +4,7 @@ yfinance==0.2.40
 plotly==5.22.0
 tensorflow==2.16.1
 streamlit-extras==0.4.2
+streamlit-parameters==0.1.5
 pandas==2.2.2
 numpy==1.26.4
 netron==7.7.1
