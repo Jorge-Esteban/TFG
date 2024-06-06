@@ -148,16 +148,15 @@ try:
     #Final Graph
     y_test_df = pd.DataFrame(y_test)
     y_predicted_df = pd.DataFrame(y_predicted)
-    y_train_df = pd.DataFrame(y_train)
     # Create a plot for the stock prediction
     fig_pred = go.Figure(
         data=[
             go.Scatter(
                 x=df.index,
                 y=y_test_df[0],
-                name="Test",
+                name="Train",
                 mode="lines",
-                line=dict(color="orange"),
+                line=dict(color="blue"),
             ),
             go.Scatter(
                 x=df.index,
@@ -165,13 +164,6 @@ try:
                 name="Forecast",
                 mode="lines",
                 line=dict(color="red"),
-            ),
-            go.Scatter(
-                x=df.index,
-                y=y_train_df[0],
-                name="Train",
-                mode="lines",
-                line=dict(color="blue"),
             )
         ]
     )
