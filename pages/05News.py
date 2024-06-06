@@ -52,7 +52,7 @@ stock_data, df = fetch_data(ticker_input)
 
 # Title
 st.title(stock_data.info['longName'] + "(" + ticker_input + ") Latest News")
-
+stock_data.news
 # Iterate over news and display
 for noticia in stock_data.news:
     show_news(noticia)
