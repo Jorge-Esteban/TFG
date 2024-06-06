@@ -27,4 +27,4 @@ streamlit-parameters==0.1.5
 streamlit-tensorboard==0.0.2
 streamlit-toggle-switch==1.0.2
 streamlit-vertical-slider==2.5.5
-trycourier==6.1.0
+trycourier==4.4.0
