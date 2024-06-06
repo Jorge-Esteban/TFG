@@ -145,7 +145,7 @@ try:
                 x=show_df.index, 
                 y=['Stock1', 'Stock2'], 
                 labels={'value': 'Price', 'variable': 'Legend'}, 
-                title=stock_data1.info['longName'] + ' vs ' + stock_data2.info['longName'] + ' 100-day Rolling Averages',
+                title=stock_data1.info['longName'] + ' vs ' + stock_data2.info['longName'] + ' 100-day Moving Averages',
                 color_discrete_map={'Stock1': '#F15050', 'Stock2': '#50BBD8'})
 
     st.plotly_chart(fig, use_container_width=True)

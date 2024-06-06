@@ -29,7 +29,7 @@ def show_news(noticia):
         # Show related tickers
         st.divider()
         if noticia['relatedTickers']:
-            tickers = ', '.join([f"[{ticker}](/News2?ticker={ticker})" for ticker in noticia['relatedTickers']])
+            tickers = ', '.join([f"[{ticker}](/News?ticker={ticker})" for ticker in noticia['relatedTickers']])
             st.markdown(f"**Related Stocks:** {tickers}")
 
 def fetch_data(ticker):
