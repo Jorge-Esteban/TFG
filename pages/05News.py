@@ -42,20 +42,20 @@ def fetch_data(ticker):
 yf.pdr_override()
 
 # Function to fetch data
-#try:
+try:
 
 # Sidebar for entering stock ticker
-ticker_input = st.sidebar.text_input('Enter the stock ticker:', st.query_params.get("ticker", "AAPL")).rstrip().strip()
+    ticker_input = st.sidebar.text_input('Enter the stock ticker:', st.query_params.get("ticker", "AAPL")).rstrip().strip()
 
 # Fetching the data
-stock_data, df = fetch_data(ticker_input)
+    stock_data, df = fetch_data(ticker_input)
 
 # Title
-st.title(stock_data.info['longName'] + "(" + ticker_input + ") Latest News")
-stock_data.news
+    st.title(stock_data.info['longName'] + "(" + ticker_input + ") Latest News")
+    stock_data.news
 # Iterate over news and display
-for noticia in stock_data.news:
-    show_news(noticia)
+    for noticia in stock_data.news:
+        show_news(noticia)
 
-#except : 
-#    st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
+except : 
+    st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
