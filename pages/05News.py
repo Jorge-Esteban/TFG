@@ -58,7 +58,7 @@ try:
         show_news(noticia)
 
 except : 
-    if stock_data: 
+    if stock_data.info['longName']: 
         st.write("There aren't any news regarding " +ticker_input)
     else:
         st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
