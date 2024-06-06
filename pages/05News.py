@@ -58,4 +58,7 @@ try:
         show_news(noticia)
 
 except : 
-    st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
+    if stock_data: 
+        st.write("There isn't any news regarding " +ticker_input)
+    else:
+        st.write("Sorry, the selected stock doesn't exist or there is no data. Try again please.")
