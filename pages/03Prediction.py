@@ -219,7 +219,7 @@ else :
         x=x_values,
         y=trainPredictPlot.flatten(),
         mode='lines',
-        name='Train Data',
+        name='Train',
         line=dict(color='green')
     )
 
