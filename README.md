@@ -2,6 +2,8 @@
 
 This web app, based on Streamlit, has 7 pages designed to provide comprehensive stock analysis and prediction capabilities. The primary focus is the **"Prediction" page**, where you can leverage two different LSTM models to forecast stock prices. These models were created in Jupyter Notebook files included in this repository. You have the flexibility to modify these files to develop new versions of the models or use the pre-trained `.h5` files that already contain the models.
 
+![Hello](images/Hello.png)
+
 ## Pages
 
 1. **Login**
